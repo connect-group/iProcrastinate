@@ -1,0 +1,130 @@
+<html>
+<head>
+    <title>iProcrastinate</title>
+    <style>
+        body { font: 1em/1.2 Helvetica, Arial }
+
+        blockquote {
+            background: #f9f9f9;
+            border-left: 10px solid #ccc;
+            margin: 1.5em 10px;
+            padding: 0.5em 10px;
+            quotes: "\201C""\201D""\2018""\2019";
+        }
+        blockquote:before {
+            color: #ccc;
+            content: open-quote;
+            font-size: 4em;
+            line-height: 0.1em;
+            margin-right: 0.25em;
+            vertical-align: -0.4em;
+        }
+        blockquote p {
+            display: inline;
+        }
+
+        .container {
+            width:50em;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>iProcrastinate</h1>
+    <blockquote>Simulate a slow HTTP Service</blockquote>
+
+    <h2>Basic Usage</h2>
+    This simple web service allows you to simulate a slow response from a web service.
+    By default, the service will simply return a basic JSON response.
+
+    <pre>
+        { "result": "OK" }
+    </pre>
+
+    <p>
+        The service will respond according to the number of milliseconds requested, for example,
+        <a href="/wait/1000"><code>http://{host}/wait/1000</code></a> will wait for 1 second.
+    </p>
+
+    <p>
+        You can also specify a range, in which case the service will choose a random time within the specified range.
+        <a href="/wait/1000-5000"><code>http://{host}/wait/1000-5000</code></a> will respond between 1 and 5 seconds
+        later.
+    </p>
+
+    <h2>Redirects</h2>
+    <p>
+        Instead of returning an "OK" response, the system can be configured to redirect to a web page after the specified delay.
+        Simply add the query string "?redirect=...." to have the system send a redirect response.
+    </p>
+    <p>
+        A simple request would be <a href="/wait/1000-5000?redirect=http://www.google.com"><code>
+        http://{host}/wait/1000-5000?redirect=http://www.google.com</code></a>.
+    </p>
+    <p>
+        The URL must be properly encoded.  For example, to get timezone information from <a href="http://api.geonames.org/timezoneJSON?formatted=true&lat=47.01&lng=10.2&username=demo&style=full">
+        http://api.geonames.org/timezoneJSON?formatted=true&lat=47.01&lng=10.2&username=demo&style=full</a>,
+        would encode as <a href="/wait/1000?redirect=http%3A%2F%2Fapi.geonames.org%2FtimezoneJSON%3Fformatted%3Dtrue%26lat%3D47.01%26lng%3D10.2%26username%3Ddemo%26style%3Dfull">
+        /wait/1000?redirect=http%3A%2F%2Fapi.geonames.org%2FtimezoneJSON%3Fformatted%3Dtrue%26lat%3D47.01%26lng%3D10.2%26username%3Ddemo%26style%3Dfull</a>.
+    </p>
+    <p>
+        The service will respond to a HTTP POST request with a 307 response code; compatible clients will then re-post
+        the data to the new location.
+    </p>
+
+    <h2>Performance</h2>
+    <p>
+        The service is built on Tomcat 8.5/Servlet 3.1 in asyncronous mode. The intention is that the system will handle
+        a large number of concurrent requests.  Part of the aim of the project was to explore Async IO and Async
+        Servlets.
+    </p>
+
+    <h2>CORS</h2>
+    <p>CORS can be added to Tomcat using a Filter in the web.xml.</p>
+    <pre>
+
+        &lt;filter>
+            &lt;filter-name>CorsFilter&lt;/filter-name>
+            &lt;filter-class>org.apache.catalina.filters.CorsFilter&lt;/filter-class>
+            &lt;async-supported>true&lt;/async-supported>
+            &lt;init-param>
+                &lt;param-name>cors.allowed.origins&lt;/param-name>
+                &lt;param-value>*&lt;/param-value>
+            &lt;/init-param>
+            &lt;init-param>
+                &lt;param-name>cors.allowed.methods&lt;/param-name>
+                &lt;param-value>GET,POST,HEAD,OPTIONS&lt;/param-value>
+            &lt;/init-param>
+            &lt;init-param>
+                &lt;param-name>cors.allowed.headers&lt;/param-name>
+                &lt;param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers&lt;/param-value>
+            &lt;/init-param>
+            &lt;init-param>
+                &lt;param-name>cors.exposed.headers&lt;/param-name>
+                &lt;param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials&lt;/param-value>
+            &lt;/init-param>
+            &lt;init-param>
+                &lt;param-name>cors.support.credentials&lt;/param-name>
+                &lt;param-value>true&lt;/param-value>
+            &lt;/init-param>
+            &lt;init-param>
+                &lt;param-name>cors.preflight.maxage&lt;/param-name>
+                &lt;param-value>1800&lt;/param-value>
+            &lt;/init-param>
+        &lt;/filter>
+        &lt;filter-mapping>
+            &lt;filter-name>CorsFilter&lt;/filter-name>
+            &lt;url-pattern>/*&lt;/url-pattern>
+        &lt;/filter-mapping>
+
+    </pre>
+
+    <h2>See Also</h2>
+    <p>
+        See also <a href="http://slowwly.robertomurray.co.uk">http://slowwly.robertomurray.co.uk</a> which provides a
+        similar service using Ruby.
+    </p>
+</div>
+</body>
+</html>
