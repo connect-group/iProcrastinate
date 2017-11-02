@@ -22,7 +22,7 @@ public class RequestProcessor {
 
     public RequestProcessor() {
         executorService = Executors.newScheduledThreadPool(1);
-        executorService.scheduleAtFixedRate(this::tick, 0, 100, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(this::tick, 0, 20, TimeUnit.MILLISECONDS);
     }
 
     public void add(Request request) {
